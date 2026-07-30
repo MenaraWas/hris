@@ -1,6 +1,6 @@
 import { UserRole } from "./user.types";
 
-export interface JWTPayload {
+export interface JwtPayload {
     sub:string;
     tenantId:string;
     email : string;
