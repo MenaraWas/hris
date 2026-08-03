@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma-service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -13,14 +13,14 @@ export class DepartmentService {
     });
 
     if (existing) {
-      throw new ConflictException('Nama Department sudah ada');
+      throw new ConflictException('Nama departemen sudah ada');
     }
 
     const department = await this.prisma.department.create({
       data: { tenantId, name: dto.name },
     });
 
-    return { message: 'Department berhasil dibuat', data: department };
+    return { message: 'Departemen berhasil dibuat', data: department };
   }
 
   async findAll(tenantId: string) {
@@ -49,18 +49,35 @@ export class DepartmentService {
   async update(tenantId: string, id: string, dto: UpdateDepartmentDto) {
     await this.findOne(tenantId, id);
 
+    if (dto.name) {
+      const existingName = await this.prisma.department.findUnique({
+        where: { name_tenantId: { name: dto.name, tenantId } },
+      });
+
+      if (existingName && existingName.id !== id) {
+        throw new ConflictException('Nama departemen sudah digunakan');
+      }
+    }
+
     const department = await this.prisma.department.update({
       where: { id },
-      data: { name: dto.name },
+      data: { ...dto },
     });
 
-    return { message: 'Departement berhasil di update', data: department };
+    return { message: 'Departemen berhasil diperbarui', data: department };
   }
 
   async remove(tenantId: string, id: string) {
-    await this.findOne(tenantId, id);
+    const { data: department } = await this.findOne(tenantId, id);
+
+    if (department._count && department._count.employees > 0) {
+      throw new BadRequestException(
+        'Departemen tidak dapat dihapus karena masih memiliki pegawai yang terdaftar',
+      );
+    }
 
     await this.prisma.department.delete({ where: { id } });
-    return { message: 'Departement Berhasil dihapus' };
+    return { message: 'Departemen berhasil dihapus' };
   }
 }
+
