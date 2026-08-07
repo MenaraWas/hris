@@ -22,6 +22,9 @@
     "turbo": "^2.10.7"
   },
   "dependencies": {
+    "@hris/shared-guards": "^1.0.0",
+    "@hris/shared-types": "^1.0.0",
+    "@hris/shared-utils": "^1.0.0",
     "@nestjs/common": "^11.1.28",
     "@nestjs/core": "^11.1.28",
     "@nestjs/jwt": "^11.0.2",
