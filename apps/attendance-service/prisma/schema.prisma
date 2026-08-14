@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model WorkLocation {
+  id          String       @id @default(uuid())
+  tenantId    String
+  name        String
+  latitude    Float
+  longitude   Float
+  radiusInMeters Float     @default(100)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  attendances Attendance[]
+
+  @@map("work_locations")
+}
+
+model WorkSchedule {
+  id           String   @id @default(uuid())
+  tenantId     String
+  name         String
+  checkInStart String
+  checkInEnd   String
+  checkOutStart String
+  checkOutEnd  String
+  lateTolerance Int     @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("work_schedules")
+}
+
+model Attendance {
+  id             String        @id @default(uuid())
+  tenantId       String
+  employeeId     String
+  workLocationId String?
+  date           DateTime
+  checkInTime    DateTime?
+  checkOutTime   DateTime?
+  checkInLat     Float?
+  checkInLon     Float?
+  checkOutLat    Float?
+  checkOutLon    Float?
+  status         String        @default("absent")
+  note           String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  workLocation   WorkLocation? @relation(fields: [workLocationId], references: [id])
+
+  @@unique([employeeId, date, tenantId])
+  @@map("attendances")
+}
