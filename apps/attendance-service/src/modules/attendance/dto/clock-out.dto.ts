@@ -2,10 +2,10 @@ import { IsString, IsNumber, Min, Max } from 'class-validator'
 
 export class ClockOutDto {
     @IsString()
-    employeeId: String;
+    employeeId: string;
 
     @IsNumber()
-    @Min(90)
+    @Min(-90)
     @Max(90)
     latitude: number;
 
