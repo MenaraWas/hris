@@ -1,12 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { PrismaModule } from './prisma.module';
 import { LeaveModule } from './modules/leave/leave.module';
 import { LeaveBalanceModule } from './modules/leave-balance/leave-balance.module';
+import { LeaveListener } from './events/leave.listener';
 
 @Module({
-  imports: [LeaveModule, LeaveBalanceModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    EventEmitterModule.forRoot(),
+    PrismaModule,
+    LeaveModule,
+    LeaveBalanceModule,
+  ],
+  providers: [LeaveListener],
 })
 export class AppModule {}
