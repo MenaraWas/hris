@@ -44,6 +44,3 @@ class LoginResponse {
     }
     
 }
-
-    
-}
